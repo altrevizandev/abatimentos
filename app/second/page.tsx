@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { useEffect, useMemo, useState } from "react";
 import { TotalAbatimentosSelecionados } from "@/components/ui/totalAbatimentosSelecionados";
 import { TotalAbatimentosSelecionadosPorNf } from "@/components/ui/totalAbatimentosSelecionadosPorNf";
+import { NfAbatimentos } from "@/components/ui/titulo";
 
 type NfType = {
     numero: string;
@@ -30,7 +31,7 @@ type NfType = {
     }[];
 };
 
-type AbatimentoType = {
+export type AbatimentoType = {
   id: number;
   nf: string;
   tipo: string;
@@ -89,22 +90,36 @@ export default function SecondPage() {
   }
 
   const totalEmAbatimentosSelecionadosPorNfRef = useMemo(() => {    
-    let soma = nfsSelected.reduce((prev, curr) => {
-      return prev + curr.valorLiquido;
-    }, 0);
-
-    setTotalSelecionadoParaAbater(soma);
+    let soma = 0;
+    
+    if (nfsSelected.length > 0) {
+      soma = nfsSelected.reduce((prev, curr) => {
+        return prev + curr.valorLiquido;
+      }, 0);
+    
+      setTotalSelecionadoParaAbater(soma);
+    } else {
+      setTotalSelecionadoParaAbater(0);
+    }
 
     return <TotalAbatimentosSelecionadosPorNf total={soma} />;
   }, [ nfsSelected ]);
   
   const totalEmAbatimentosSelecionados = useMemo(() => {
-    let soma = abatimentosSelected.reduce((prev, curr) => {
-      return prev + curr.valor;
-    }, 0);
+    let soma = 0;
+
+    if (nfsSelected.length == 0) {
+      if (abatimentosSelected.length > 0) {
+        setAbatimentosSelected([]);
+      }
+    } else {
+      soma = abatimentosSelected.reduce((prev, curr) => {
+        return prev + curr.valor;
+      }, 0);
+    }
 
     return <TotalAbatimentosSelecionados totalSelecionado={soma} total={totalSelecionadoParaAbater} />
-  }, [ abatimentosSelected ]);
+  }, [ abatimentosSelected, totalSelecionadoParaAbater ]);
 
   return (
     <div className="flex flex-col gap-y-10">
@@ -125,7 +140,7 @@ export default function SecondPage() {
       >
         <span className="text-2xl font-medium">Abatimentos</span>
         <div className="grid gap-3 grid-cols-1 md:grid-cols-2">
-          <Card>
+          <Card className="h-max">
             <CardContent className="flex flex-col gap-3">
               <span className="font-medium text-lg">NFs de Devolução</span>
               <Field orientation="horizontal" className="mb-3 self-start md:max-w-96">
@@ -150,22 +165,15 @@ export default function SecondPage() {
           </Card>
           {nfsSelected.length > 0 && (
             <Card>
-              <CardContent className="flex flex-col gap-3">
+              <CardContent className="flex gap-3 flex-col">
                 <span className="font-medium text-lg">Abatimentos</span>
-                <div className="p-3 flex flex-col gap-3">
-                  {abatimentos.map((data) => (
-                    <Field key={data.id} orientation='horizontal'>
-                      <Checkbox
-                        id={`nf-${data.id}-checkbox`}
-                        name={`nf-${data.id}-checkbox`}
-                        onCheckedChange={() => {
-                          selectAbatimentos(data);
-                        }}
-                      />
-                      <Label htmlFor={`nf-${data.id}-checkbox`}>{data.descricao} - R$ {data.valor}</Label>
-                    </Field>
-                  ))}
-                </div>
+                {abatimentos.map((abatimento) => (
+                  <NfAbatimentos
+                    key={abatimento.id}
+                    abatimento={abatimento}
+                    selectAbatimentos={selectAbatimentos}
+                  />
+                ))}
               </CardContent>
             </Card>
           )}
