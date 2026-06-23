@@ -16,31 +16,39 @@ import { TotalAbatimentosSelecionadosPorNf } from "@/components/ui/totalAbatimen
 import { Titulo } from "@/components/ui/titulo";
 
 type NfType = {
-    numero: string;
-    serie: string;
-    dataEmissao: string;
-    valorBruto: number;
-    valorAbatimentos: number;
-    valorLiquido: number;
+  numero: string;
+  serie: string;
+  dataEmissao: string;
+  valorBruto: number;
+  valorAbatimentos: number;
+  valorLiquido: number;
+  status: string;
+  abatimentos: {
+    id: number;
+    tipo: string;
+    descricao: string;
+    valor: number;
     status: string;
-    abatimentos: {
-        id: number;
-        tipo: string;
-        descricao: string;
-        valor: number;
-        status: string;
-    }[];
+  }[];
 };
 
 export type TitulosType = {
-    numero: number;
-    parcelas: {
-        id: number,
-        validade: string;
-        descricao: string;
-        valor: number;
-    }[];
+  numero: number;
+  parcelas: {
+    id: number,
+    validade: string;
+    descricao: string;
+    valor: number;
+  }[];
 };
+
+export type ParcelaType = {
+  id: number,
+  title: number,
+  validade: string;
+  descricao: string;
+  valor: number;
+}
 
 export default function Homepage() {
   const [total, setTotal] = useState(0);
@@ -48,7 +56,7 @@ export default function Homepage() {
   const [nfs, setNfs] = useState<NfType[]>(NfsData.notas ?? []);
   const [titulos, setTitulos] = useState<TitulosType[]>([]);
   const [nfsSelected, setNfsSelected] = useState<NfType[]>([]);
-  const [titulosSelected, setTitulosSelected] = useState<TitulosType[]>([]);
+  const [parcelas, setParcelas] = useState<ParcelaType[]>([]);
   
   useEffect(() => {
     async function loadAbatimentos() {
@@ -72,17 +80,29 @@ export default function Homepage() {
     }
   }
 
-  const selectTitulos = (titulo: TitulosType) => {
-    if (titulosSelected.includes(titulo)) {
-      setTitulosSelected((prev) => prev.filter(prevAbatimento => prevAbatimento.numero != titulo.numero));
+  const selectParcelas = (parcela: ParcelaType) => {
+    if (parcelas.length == 0) {
+      setParcelas((prev) => [...prev,parcela]);
     } else {
-      setTitulosSelected((prev) => [ ...prev, titulo ]);
+      let parcIncluded = false;
+      
+      parcelas.forEach((parc) => {
+        if (parc.id == parcela.id) {
+          parcIncluded = true;
+        }
+      });
+
+      if (parcIncluded) {
+        setParcelas((prev) => prev.filter((prParc) => prParc.id != parcela.id));
+      } else {
+        setParcelas((prev) => [...prev,parcela]);
+      }
     }
   }
 
   const totalEmAbatimentosSelecionadosPorNfRef = useMemo(() => {    
     let soma = 0;
-    
+
     if (nfsSelected.length > 0) {
       soma = nfsSelected.reduce((prev, curr) => {
         return prev + curr.valorLiquido;
@@ -100,19 +120,21 @@ export default function Homepage() {
     let soma = 0;
 
     if (nfsSelected.length == 0) {
-      if (titulosSelected.length > 0) {
-        setTitulosSelected([]);
+      if (parcelas.length > 0) {
+        setParcelas([]);
       }
     } else {
-      soma = titulosSelected.reduce((prev, curr) => {
-        return curr.parcelas.reduce((prevParc, currParc) => {
-          return prev + currParc.valor;
-        }, 0);
+      soma = parcelas.reduce((totalParcelas, parc) => {
+        return totalParcelas + parc.valor;
       }, 0);
     }
 
-    return <TotalAbatimentosSelecionados totalSelecionado={soma} total={totalSelecionadoParaAbater} />
-  }, [ titulosSelected, totalSelecionadoParaAbater ]);
+    return (
+      <>
+        <TotalAbatimentosSelecionados totalSelecionado={soma} total={totalSelecionadoParaAbater} />
+      </>
+    );
+  }, [ parcelas, totalSelecionadoParaAbater ]);
 
   return (
     <div className="flex flex-col gap-y-10">
@@ -163,7 +185,7 @@ export default function Homepage() {
                   <Titulo
                     key={titulo.numero}
                     titulo={titulo}
-                    selectTitulos={selectTitulos}
+                    selectParcelas={selectParcelas}
                   />
                 ))}
               </CardContent>

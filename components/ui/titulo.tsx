@@ -7,14 +7,14 @@ import {
 import { Field } from "./field";
 import { Checkbox } from "./checkbox";
 import { Label } from "./label";
-import { TitulosType } from "@/app/page";
+import { ParcelaType, TitulosType } from "@/app/page";
 
 export const Titulo = ({
   titulo,
-  selectTitulos
+  selectParcelas
 }: {
   titulo: TitulosType,
-  selectTitulos: (titulos: TitulosType) => void
+  selectParcelas: (parcela: ParcelaType) => void
 }) => {
   return (
     <Accordion
@@ -24,17 +24,23 @@ export const Titulo = ({
     >
       <AccordionItem value="item-1" className="border rounded h-max">
         <AccordionTrigger className="px-3">NF {titulo.numero}</AccordionTrigger>
-        <AccordionContent className="px-3">
+        <AccordionContent className="px-3 h-max flex flex-col gap-3">
           {titulo.parcelas.map((parcela) => (
-            <Field key={parcela.id} orientation='horizontal'>
+            <Field key={titulo.numero-parcela.id} orientation='horizontal'>
               <Checkbox
-                id={`nf-${parcela.id}-checkbox`}
-                name={`nf-${parcela.id}-checkbox`}
+                id={`titulo-${titulo.numero}-${parcela.id}-checkbox`}
+                name={`titulo-${titulo.numero}-${parcela.id}-checkbox`}
                 onCheckedChange={() => {
-                  selectTitulos(titulo);
+                  selectParcelas({
+                    id: parcela.id,
+                    title: titulo.numero,
+                    descricao: parcela.descricao,
+                    validade: parcela.validade,
+                    valor: parcela.valor
+                  });
                 }}
               />
-              <Label htmlFor={`nf-${parcela.id}-checkbox`}>{parcela.descricao} - R$ {parcela.valor}</Label>
+              <Label htmlFor={`titulo-${titulo.numero}-${parcela.id}-checkbox`}>{parcela.descricao} - R$ {parcela.valor} - {parcela.validade}</Label>
             </Field>
           ))}
         </AccordionContent>
@@ -42,5 +48,3 @@ export const Titulo = ({
     </Accordion>
   );
 }
-
-//300 dols p/ mes
