@@ -1,5 +1,7 @@
 import Fastify, { type FastifyInstance } from 'fastify';
 import {
+  hasZodFastifySchemaValidationErrors,
+  isResponseSerializationError,
   jsonSchemaTransform,
   serializerCompiler,
   validatorCompiler,
@@ -51,7 +53,20 @@ export class App {
     });
 
     this.app.setErrorHandler((error, request, reply) => {
-      console.error(error);
+      if (hasZodFastifySchemaValidationErrors(error)) {
+        return reply.code(400).send({
+          status: "ERROR",
+          message: "Validation error" + JSON.stringify(error.validation),
+          errors: error.validation,
+        });
+      }
+
+      if (isResponseSerializationError(error)) {
+        return reply.code(500).send({
+          status: "ERROR",
+          message: "Invalid response schema" + error.cause,
+        });
+      }
 
       if (error instanceof ApiError) {
         return reply.status(error.statusCode).send({
