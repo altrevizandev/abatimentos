@@ -1,16 +1,18 @@
 import { compare } from "bcryptjs";
 import { AccountRepository } from "../../repositories/Account-repository.js";
 import { ApiError } from "../../utils/ApiError.js";
+import { AccountRoleRepository } from "../../repositories/AccountRoles-repository.js";
 
 export class SignInService {
-  public name: string = "";
   public email: string = "";
   public password: string = "";
 
   private readonly accountRepository: AccountRepository;
+  private readonly accountRoleRepository: AccountRoleRepository;
   
   constructor() {
     this.accountRepository = new AccountRepository();
+    this.accountRoleRepository = new AccountRoleRepository();
   }
 
   public async execute() {
@@ -29,11 +31,19 @@ export class SignInService {
       throw new ApiError("E-mail ou senha invalidos", 404);
     }
 
+    this.accountRoleRepository.account_id = account.id;
+
+    const accountRole = await this.accountRoleRepository.findByAccountId();
+
+    if (!accountRole) {
+      throw new ApiError("Nenhuma função foi encontrada para essa conta", 404);
+    }
+
     return {
       id: account.id,
       name: account.name,
       email: account.email,
-      cnpj: "",
+      role: accountRole.role.slug,
       created_at: account.created_at,
       updated_at: account.updated_at
     };

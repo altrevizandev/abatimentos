@@ -67,5 +67,7 @@ model AccountRoles {
   created_at DateTime @default(now())
   updated_at DateTime @default(now())
 
+  @@index([account_id, role_id])
+
   @@map("account_roles")
 }

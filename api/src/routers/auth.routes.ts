@@ -6,12 +6,15 @@ import type {
 import { z } from 'zod';
 import { SignInController, type SignInRequest } from "../controllers/auth/Sign-in-controller.js";
 import { SignOutController } from "../controllers/auth/Sign-out-controller.js";
+import { SelectCNPJController, type SelectCNPJRequest } from "../controllers/account/SelectCNPJ-controller.js";
+import { checkAuth } from "../middleware/jwt.js";
 
 export async function AuthRoutes(
   fastify: FastifyInstance
 ) {
   const signInController = new SignInController();
   const signOutController = new SignOutController();
+  const selectCNPJController = new SelectCNPJController();
 
   const ErrorResponseSchema = z.object({
     status: z.literal("ERROR"),
@@ -72,7 +75,7 @@ export async function AuthRoutes(
     }
   );
 
-  fastify.post(
+  fastify.delete(
     "/auth/sign-out",
     {
       schema: {
@@ -91,6 +94,37 @@ export async function AuthRoutes(
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       return signOutController.handle(request, reply);
+    }
+  );
+  
+  fastify.post(
+    "/auth/select-cnpj",
+    {
+      schema: {
+        tags: ["Autenticação"],
+        description: "Endpoint responsável por acessar com o CNPJ selecionado",
+        security: [
+          {
+            bearerAuth: []
+          }
+        ],
+        body: z.object({
+          cnpj: z.string().min(14, "O CNPJ precisa ter 14 caracteres"),
+        }),
+        response: {
+          204: z.object({
+            message: z.string(),
+          }),
+
+          400: ErrorResponseSchema,
+
+          500: ErrorResponseSchema
+        }
+      },
+      preHandler: [ checkAuth ],
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      return selectCNPJController.handle(request as FastifyRequest<SelectCNPJRequest>, reply);
     }
   );
 }

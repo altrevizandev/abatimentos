@@ -3,6 +3,7 @@ import { prisma } from "../infra/prisma/index.js";
 import type { PrismaTransactionClient } from "./index.js";
 
 export class AccountRepository {
+  public account_id: number = 0;
   public name: string = "";
   public email: string = "";
   public password: string = "";
@@ -33,15 +34,31 @@ export class AccountRepository {
   }
 
   public async findById() {
-
-  }
-  
-  public async findByEmail() {
     const account = await this.prismaClient.account.findUnique({
-      where: { email: this.email }
+      where: { id: this.account_id }
     });
 
     return account;
+  }
+  
+  public async findByEmail() {
+    const account = await this.prismaClient.account.findFirst({
+      where: { email: this.email },
+    });
+
+    return account;
+  }
+
+  public async getAccountDetails() {
+    const details = await this.prismaClient.accountRoles.findFirst({
+      where: { account_id: this.account_id },
+      include: {
+        account: true,
+        role: true
+      }
+    });
+
+    return details;
   }
 
   public async deleteById() {

@@ -30,5 +30,4 @@ export class AccountAddCnpjsController {
 
     return reply.code(201).send(count);
   }
-
 }

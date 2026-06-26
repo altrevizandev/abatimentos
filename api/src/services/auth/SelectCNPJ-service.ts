@@ -2,7 +2,7 @@ import { AccountRepository } from "../../repositories/Account-repository.js";
 import { AccountInfoRepository } from "../../repositories/AccountInfo-repository.js";
 import { ApiError } from "../../utils/ApiError.js";
 
-export class MeService {
+export class SelectCNPJService {
   public cnpj: string = "";
   public account_id: number = 0;
 
@@ -19,13 +19,13 @@ export class MeService {
     this.accountInfoRepository.cnpjs = [ this.cnpj ];
     this.accountRepository.account_id = this.account_id;
 
-    const account = await this.accountRepository.findById();
+    const accountDetails = await this.accountRepository.findById();
 
-    if (!account) {
+    if (!accountDetails) {
       throw new ApiError("Conta invalida ou não encontrada", 404);
     }
 
-    const accountInfo = await this.accountInfoRepository.meDetails();
+    const accountInfo = await this.accountInfoRepository.selectAccountInfoByIDAndCNPJ();
 
     return accountInfo;
   }  

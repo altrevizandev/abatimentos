@@ -35,6 +35,55 @@ export class AccountInfoRepository {
     return accounts;
   }
 
+  public async selectAccountInfoByIDAndCNPJ() {
+    const accountInfo = await this.prismaClient.accountInfo.findFirst({
+      where: {
+        account_id: this.account_id,
+        cnpj: this.cnpjs[0]!
+      },
+      include: {
+        account: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          }
+        },
+      }
+    });
+
+    return accountInfo;
+  }
+  
+  public async listAccountInfo() {
+    const accountInfo = await this.prismaClient.accountInfo.findMany({
+      where: {
+        account_id: this.account_id,
+      }
+    });
+
+    return accountInfo;
+  }
+  
+  public async meDetails() {
+    const accountInfo = await this.prismaClient.accountInfo.findFirst({
+      where: {
+        account_id: this.account_id
+      },
+      include: {
+        account: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          }
+        },
+      }
+    });
+
+    return accountInfo;
+  }
+
   public async deleteById() {
 
   }
