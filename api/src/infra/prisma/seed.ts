@@ -3,19 +3,30 @@ import { hash } from 'bcryptjs';
 
 async function main() {
 
-  let password_hashed = await hash("Alt@123456", 12);
+  let admin_password_hashed = await hash("Admin@123456789_2026", 12);
+  let operator_password_hashed = await hash("Operator@123456789_2026", 12);
 
-  await prisma.account.upsert({
-    where: { email: 'andre.trevizan@tirol.com.br' },
+  const admin_account = await prisma.account.upsert({
+    where: { email: 'admin@tirol.com.br' },
     update: {},
     create: {
-      name: 'Andre Lucas Trevizan',
-      email: 'andre.trevizan@tirol.com.br',
-      password: password_hashed
+      name: 'Admin T.I',
+      email: 'admin@tirol.com.br',
+      password: admin_password_hashed
     }
   });
 
-  await prisma.role.upsert({
+  const operator_account = await prisma.account.upsert({
+    where: { email: 'operator@tirol.com.br' },
+    update: {},
+    create: {
+      name: 'Operator T.I',
+      email: 'operator@tirol.com.br',
+      password: operator_password_hashed
+    }
+  });
+
+  const admin_role = await prisma.role.upsert({
     where: { slug: 'admin' },
     update: {},
     create: {
@@ -24,13 +35,27 @@ async function main() {
     },
   });
 
-  await prisma.role.upsert({
+  const operator_role = await prisma.role.upsert({
     where: { slug: 'operator' },
     update: {},
     create: {
       name: 'Operator',
       slug: 'operator',
     },
+  });
+
+  await prisma.accountRoles.create({
+    data: {
+      account_id: admin_account.id,
+      role_id: admin_role.id
+    }
+  });
+  
+  await prisma.accountRoles.create({
+    data: {
+      account_id: operator_account.id,
+      role_id: operator_role.id
+    }
   });
 }
 

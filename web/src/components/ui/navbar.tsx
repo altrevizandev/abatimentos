@@ -7,12 +7,13 @@ import {
   Drawer,
   DrawerContent,
   DrawerTrigger
-} from "@/components/ui/drawer";
+} from "./drawer";
 import { Button } from "./button";
-import { useSignedAccount } from '../../store/signedAccount';
+import { useSignedAccount } from '../../../store/signedAccount';
 import { useState } from 'react';
 import { ApiErrorData } from '../forms/SignIn';
 import { useRouter } from 'next/navigation';
+import { Separator } from './separator';
 
 export const Navbar = () => {
   const [apiError, setApiError] = useState<ApiErrorData>({
@@ -75,7 +76,12 @@ export const Navbar = () => {
                   gap-5
                 "
               >
+                <small>Logado como</small>
                 <span className='font-md'>{account?.name}</span>
+                <Separator />
+                <small>Navegação</small>
+                <a href="/accounts" className="hover:cursor-pointer border rounded px-2">Contas</a>
+                <Separator />
                 <Button
                   size='sm'
                   variant='destructive'

@@ -15,8 +15,8 @@ import {
   Alert,
   AlertDescription,
   AlertTitle,
-} from "@/components/ui/alert";
-import { SignedAccount, useSignedAccount } from '../../store/signedAccount';
+} from "../ui/alert";
+import { SignedAccount, useSignedAccount } from '../../../store/signedAccount';
 import { Separator } from '../ui/separator';
 
 const signInSchema = z.object({

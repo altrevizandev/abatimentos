@@ -1,19 +1,19 @@
 'use client';
 
-import { Button } from "../../../components/ui/button";
-import { Card, CardContent } from "../../../components/ui/card";
-import { Field } from "../../../components/ui/field";
-import { Input } from "../../../components/ui/input";
-import { TotalAbatimentos } from "../../../components/ui/totalAbatimentos";
+import { Button } from "../components/ui/button";
+import { Card, CardContent } from "../components/ui/card";
+import { Field } from "../components/ui/field";
+import { Input } from "../components/ui/input";
+import { TotalAbatimentos } from "../components/ui/totalAbatimentos";
 
-import NfsData from '../../../app/_mock/nfs_ref.json';
-import TitulosData from '../../../app/_mock/titulos.json';
-import { Checkbox } from "../../../components/ui/checkbox";
-import { Label } from "../../../components/ui/label";
+import NfsData from './_mock/nfs_ref.json';
+import TitulosData from './_mock/titulos.json';
+import { Checkbox } from "../components/ui/checkbox";
+import { Label } from "../components/ui/label";
 import { useEffect, useMemo, useState } from "react";
-import { TotalAbatimentosSelecionados } from "../../../components/ui/totalAbatimentosSelecionados";
-import { TotalAbatimentosSelecionadosPorNf } from "../../../components/ui/totalAbatimentosSelecionadosPorNf";
-import { Titulo } from "../../../components/ui/titulo";
+import { TotalAbatimentosSelecionados } from "../components/ui/totalAbatimentosSelecionados";
+import { TotalAbatimentosSelecionadosPorNf } from "../components/ui/totalAbatimentosSelecionadosPorNf";
+import { Titulo } from "../components/ui/titulo";
 
 type NfType = {
   numero: string;
@@ -50,7 +50,7 @@ export type ParcelaType = {
   valor: number;
 }
 
-export default function Dashboardpage() {
+export default function Homepage() {
   const [total, setTotal] = useState(0);
   const [totalSelecionadoParaAbater, setTotalSelecionadoParaAbater] = useState(0);
   const [nfs, setNfs] = useState<NfType[]>(NfsData.notas ?? []);
@@ -146,7 +146,7 @@ export default function Dashboardpage() {
           md:grid-cols-3
         "
       >
-        <TotalAbatimentos total={total} />  
+        <TotalAbatimentos total={total} />
         {totalEmAbatimentosSelecionadosPorNfRef}
         {totalEmAbatimentosSelecionados}
       </div>

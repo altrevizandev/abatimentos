@@ -1,4 +1,3 @@
-import { Navbar } from "../../../components/ui/navbar";
 import { getAuthenticatedAccount } from "../../../lib/auth";
 import { redirect } from "next/navigation";
 

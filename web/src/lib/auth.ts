@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { SignedAccount } from "../store/signedAccount";
+import { SignedAccount } from "../../store/signedAccount";
 
 export async function getAuthenticatedAccount() {
   const cookieStore = await cookies();
@@ -18,5 +18,9 @@ export async function getAuthenticatedAccount() {
     return null;
   }
 
-  return await response.json() as SignedAccount;
+  const {
+    account
+  } = await response.json() as { account: SignedAccount };
+
+  return account as SignedAccount;
 }
