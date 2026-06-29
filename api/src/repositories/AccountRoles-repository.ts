@@ -14,17 +14,11 @@ export class AccountRoleRepository {
     this.roleRepository = new RoleRepository();
   }
 
-  public async createAccountRole(account_type: string) {
-    const role = await this.roleRepository.findBySlug(account_type);
-
-    if (!role) {
-      throw new ApiError("Função não encontrada", 500);
-    }
-
+  public async createAccountRole() {
     const account = this.prismaClient.accountRoles.create({
       data: {
         account_id: this.account_id,
-        role_id: role.id
+        role_id: this.role_id
       }
     });
 
@@ -32,10 +26,11 @@ export class AccountRoleRepository {
   }
 
   public async findByAccountId() {
-    return await this.prismaClient.accountRoles.findUnique({
-      where: { id: this.account_id },
+    return await this.prismaClient.accountRoles.findFirst({
+      where: { account_id: this.account_id },
       include: {
         role: true,
+        account: true,
       }
     });
   }

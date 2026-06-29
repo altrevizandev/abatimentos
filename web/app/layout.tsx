@@ -1,9 +1,8 @@
 import { Geist, Geist_Mono } from "next/font/google"
 
 import "./globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
-import { cn } from "@/lib/utils";
-import { Navbar } from "@/components/ui/navbar";
+import { cn } from "../lib/utils"
+import { ThemeProvider } from "next-themes"
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'})
 
@@ -24,8 +23,7 @@ export default function RootLayout({
       className={cn("antialiased", fontMono.variable, "font-sans", geist.variable)}
     >
       <body>
-        <Navbar />
-        <main className="container p-3 flex flex-col m-auto">
+        <main className="container flex flex-col m-auto">
           <ThemeProvider>
             {children}
           </ThemeProvider>

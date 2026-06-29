@@ -1,66 +1,66 @@
 'use client';
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Field } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { TotalAbatimentos } from "@/components/ui/totalAbatimentos";
+import { Button } from "../../../components/ui/button";
+import { Card, CardContent } from "../../../components/ui/card";
+import { Field } from "../../../components/ui/field";
+import { Input } from "../../../components/ui/input";
+import { TotalAbatimentos } from "../../../components/ui/totalAbatimentos";
 
-import NfsData from '@/app/_mock/nfs_ref.json';
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
+import NfsData from '../../../app/_mock/nfs_ref.json';
+import TitulosData from '../../../app/_mock/titulos.json';
+import { Checkbox } from "../../../components/ui/checkbox";
+import { Label } from "../../../components/ui/label";
 import { useEffect, useMemo, useState } from "react";
-import { TotalAbatimentosSelecionados } from "@/components/ui/totalAbatimentosSelecionados";
-import { TotalAbatimentosSelecionadosPorNf } from "@/components/ui/totalAbatimentosSelecionadosPorNf";
+import { TotalAbatimentosSelecionados } from "../../../components/ui/totalAbatimentosSelecionados";
+import { TotalAbatimentosSelecionadosPorNf } from "../../../components/ui/totalAbatimentosSelecionadosPorNf";
+import { Titulo } from "../../../components/ui/titulo";
 
 type NfType = {
-    numero: string;
-    serie: string;
-    dataEmissao: string;
-    valorBruto: number;
-    valorAbatimentos: number;
-    valorLiquido: number;
+  numero: string;
+  serie: string;
+  dataEmissao: string;
+  valorBruto: number;
+  valorAbatimentos: number;
+  valorLiquido: number;
+  status: string;
+  abatimentos: {
+    id: number;
+    tipo: string;
+    descricao: string;
+    valor: number;
     status: string;
-    abatimentos: {
-        id: number;
-        tipo: string;
-        descricao: string;
-        valor: number;
-        status: string;
-    }[];
+  }[];
 };
 
-export type AbatimentoType = {
-  id: number;
-  nf: string;
-  tipo: string;
+export type TitulosType = {
+  numero: number;
+  parcelas: {
+    id: number,
+    validade: string;
+    descricao: string;
+    valor: number;
+  }[];
+};
+
+export type ParcelaType = {
+  id: number,
+  title: number,
+  validade: string;
   descricao: string;
   valor: number;
-  status: string;
-};
+}
 
-export default function SecondPage() {
+export default function Dashboardpage() {
   const [total, setTotal] = useState(0);
   const [totalSelecionadoParaAbater, setTotalSelecionadoParaAbater] = useState(0);
   const [nfs, setNfs] = useState<NfType[]>(NfsData.notas ?? []);
-  const [abatimentos, setAbatimentos] = useState<AbatimentoType[]>([]);
+  const [titulos, setTitulos] = useState<TitulosType[]>([]);
   const [nfsSelected, setNfsSelected] = useState<NfType[]>([]);
-  const [abatimentosSelected, setAbatimentosSelected] = useState<AbatimentoType[]>([]);
+  const [parcelas, setParcelas] = useState<ParcelaType[]>([]);
   
   useEffect(() => {
     async function loadAbatimentos() {
-      nfs.forEach((nf) => {
-        nf.abatimentos.map((abatimento) => {
-          setAbatimentos((prev) => [...prev, {
-            id: abatimento.id,
-            nf: nf.numero,
-            tipo: abatimento.tipo,
-            descricao: abatimento.descricao,
-            valor: abatimento.valor,
-            status: abatimento.status
-          }]);
-        })
-      });
+      setTitulos(TitulosData.titulos);
 
       let somaTotal = nfs.reduce((prev, nf) => {
         return prev + nf.valorLiquido;
@@ -79,18 +79,30 @@ export default function SecondPage() {
       setNfsSelected((prev) => [ ...prev, nf ]);
     }
   }
-  
-  const selectAbatimentos = (abatimento: AbatimentoType) => {
-    if (abatimentosSelected.includes(abatimento)) {
-      setAbatimentosSelected((prev) => prev.filter(prevAbatimento => prevAbatimento.id != abatimento.id));
+
+  const selectParcelas = (parcela: ParcelaType) => {
+    if (parcelas.length == 0) {
+      setParcelas((prev) => [...prev,parcela]);
     } else {
-      setAbatimentosSelected((prev) => [ ...prev, abatimento ]);
+      let parcIncluded = false;
+      
+      parcelas.forEach((parc) => {
+        if (parc.id == parcela.id) {
+          parcIncluded = true;
+        }
+      });
+
+      if (parcIncluded) {
+        setParcelas((prev) => prev.filter((prParc) => prParc.id != parcela.id));
+      } else {
+        setParcelas((prev) => [...prev,parcela]);
+      }
     }
   }
 
   const totalEmAbatimentosSelecionadosPorNfRef = useMemo(() => {    
     let soma = 0;
-    
+
     if (nfsSelected.length > 0) {
       soma = nfsSelected.reduce((prev, curr) => {
         return prev + curr.valorLiquido;
@@ -108,17 +120,21 @@ export default function SecondPage() {
     let soma = 0;
 
     if (nfsSelected.length == 0) {
-      if (abatimentosSelected.length > 0) {
-        setAbatimentosSelected([]);
+      if (parcelas.length > 0) {
+        setParcelas([]);
       }
     } else {
-      soma = abatimentosSelected.reduce((prev, curr) => {
-        return prev + curr.valor;
+      soma = parcelas.reduce((totalParcelas, parc) => {
+        return totalParcelas + parc.valor;
       }, 0);
     }
 
-    return <TotalAbatimentosSelecionados totalSelecionado={soma} total={totalSelecionadoParaAbater} />
-  }, [ abatimentosSelected, totalSelecionadoParaAbater ]);
+    return (
+      <>
+        <TotalAbatimentosSelecionados totalSelecionado={soma} total={totalSelecionadoParaAbater} />
+      </>
+    );
+  }, [ parcelas, totalSelecionadoParaAbater ]);
 
   return (
     <div className="flex flex-col gap-y-10">
@@ -130,18 +146,17 @@ export default function SecondPage() {
           md:grid-cols-3
         "
       >
-        <TotalAbatimentos total={total} />
+        <TotalAbatimentos total={total} />  
         {totalEmAbatimentosSelecionadosPorNfRef}
         {totalEmAbatimentosSelecionados}
       </div>
       <div
         className="flex flex-col gap-3"
       >
-        <span className="text-2xl font-medium">Abatimentos</span>
         <div className="grid gap-3 grid-cols-1 md:grid-cols-2">
           <Card className="h-max">
             <CardContent className="flex flex-col gap-3">
-              <span className="font-medium text-lg">NFs de Devolução</span>
+              <span className="font-medium text-lg">NFs de Devolução Lançadas</span>
               <Field orientation="horizontal" className="mb-3 self-start md:max-w-96">
                 <Input type="search" placeholder="Buscar NF de referencia..." />
                 <Button>Buscar</Button>
@@ -165,14 +180,14 @@ export default function SecondPage() {
           {nfsSelected.length > 0 && (
             <Card>
               <CardContent className="flex gap-3 flex-col">
-                <span className="font-medium text-lg">Abatimentos</span>
-                {/* {abatimentos.map((abatimento) => (
-                  <NfAbatimentos
-                    key={abatimento.id}
-                    abatimento={abatimento}
-                    selectAbatimentos={selectAbatimentos}
+                <span className="font-medium text-lg">Saldo devedor - Titulos</span>
+                {titulos.map((titulo) => (
+                  <Titulo
+                    key={titulo.numero}
+                    titulo={titulo}
+                    selectParcelas={selectParcelas}
                   />
-                ))} */}
+                ))}
               </CardContent>
             </Card>
           )}

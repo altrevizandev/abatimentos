@@ -14,10 +14,10 @@ export class RoleRepository {
     private readonly prismaClient: PrismaTransactionClient = prisma
   ) {}
 
-  public async findBySlug(slug: string) {
+  public async findBySlug() {
     return await this.prismaClient.role.findFirst({
       where: {
-        slug
+        slug: this.slug
       }
     });
   }

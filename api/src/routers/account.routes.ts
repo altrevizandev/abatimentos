@@ -8,6 +8,8 @@ import { CreateAccountController, type CreateAccountRequest } from "../controlle
 import { AccountAddCnpjsController, type AccountAddCnpjsRequest } from "../controllers/account/AddCnpjs-controller.js";
 import { checkAuth } from "../middleware/jwt.js";
 import { ListCNPJSController } from "../controllers/account/ListCNPSController.js";
+import { checkAdminAuth } from "../middleware/adminAuth.js";
+import { ListAccountsController } from "../controllers/account/List-controller.js";
 
 export async function AccountRoutes(
   fastify: FastifyInstance
@@ -15,6 +17,7 @@ export async function AccountRoutes(
   const createAccountController = new CreateAccountController();
   const accountAddCnpjsController = new AccountAddCnpjsController();
   const listCNPJSController = new ListCNPJSController();
+  const listAccountsController = new ListAccountsController();
 
   const ErrorResponseSchema = z.object({
     status: z.literal("ERROR"),
@@ -52,6 +55,39 @@ export async function AccountRoutes(
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       return createAccountController.handle(request as FastifyRequest<CreateAccountRequest>, reply);
+    }
+  );
+  
+  fastify.get(
+    "/account",
+    {
+      schema: {
+        tags: ["Contas de Acesso"],
+        description: "Endpoint responsável por buscar as contas de usuário",
+        security: [
+          {
+            bearerAuth: []
+          }
+        ],
+        response: {
+          200: z.array(z.object({
+            id: z.number(),
+            name: z.string(),
+            email: z.string(),
+            role: z.string(),
+            created_at: z.date(),
+            updated_at: z.date(),
+          })),
+
+          400: ErrorResponseSchema,
+
+          500: ErrorResponseSchema
+        }
+      },
+      preHandler: [ checkAdminAuth ],
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      return listAccountsController.handle(request, reply);
     }
   );
   

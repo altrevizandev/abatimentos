@@ -12,11 +12,7 @@ export class ListCNPJSService {
   public async execute() {
     this.accountInfoRepository.account_id = this.account_id;
 
-    console.log(this.account_id);
-
     const accountCNPJs = await this.accountInfoRepository.listAccountInfo();
-
-    console.log(accountCNPJs);
 
     let cnpjs: string[] = [];
 

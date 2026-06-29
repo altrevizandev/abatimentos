@@ -1,32 +1,30 @@
-import { AccountRepository } from "../../repositories/Account-repository.js";
-import { AccountInfoRepository } from "../../repositories/AccountInfo-repository.js";
+import { AccountRoleRepository } from "../../repositories/AccountRoles-repository.js";
 import { ApiError } from "../../utils/ApiError.js";
 
 export class MeService {
-  public cnpj: string = "";
   public account_id: number = 0;
-
-  private readonly accountInfoRepository: AccountInfoRepository;
-  private readonly accountRepository: AccountRepository;
+  private readonly accountRoleRepository: AccountRoleRepository;
   
   constructor() {
-    this.accountInfoRepository = new AccountInfoRepository();
-    this.accountRepository = new AccountRepository();
+    this.accountRoleRepository = new AccountRoleRepository();
   }
 
   public async execute() {
-    this.accountInfoRepository.account_id = this.account_id;
-    this.accountInfoRepository.cnpjs = [ this.cnpj ];
-    this.accountRepository.account_id = this.account_id;
+    this.accountRoleRepository.account_id = this.account_id;
 
-    const account = await this.accountRepository.findById();
+    const accountRole = await this.accountRoleRepository.findByAccountId();
 
-    if (!account) {
-      throw new ApiError("Conta invalida ou não encontrada", 404);
+    if (!accountRole) {
+      throw new ApiError("Nenhuma função foi encontrada para essa conta", 404);
     }
 
-    const accountInfo = await this.accountInfoRepository.meDetails();
-
-    return accountInfo;
+    return {
+      id: accountRole.account.id,
+      name: accountRole.account.name,
+      email: accountRole.account.email,
+      role: accountRole.role.slug,
+      created_at: accountRole.account.created_at,
+      updated_at: accountRole.account.updated_at
+    };
   }  
 }

@@ -1,19 +1,19 @@
 'use client';
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Field } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { TotalAbatimentos } from "@/components/ui/totalAbatimentos";
+import { Button } from "../components/ui/button";
+import { Card, CardContent } from "../components/ui/card";
+import { Field } from "../components/ui/field";
+import { Input } from "../components/ui/input";
+import { TotalAbatimentos } from "../components/ui/totalAbatimentos";
 
-import NfsData from '@/app/_mock/nfs_ref.json';
-import TitulosData from '@/app/_mock/titulos.json';
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
+import NfsData from '../app/_mock/nfs_ref.json';
+import TitulosData from '../app/_mock/titulos.json';
+import { Checkbox } from "../components/ui/checkbox";
+import { Label } from "../components/ui/label";
 import { useEffect, useMemo, useState } from "react";
-import { TotalAbatimentosSelecionados } from "@/components/ui/totalAbatimentosSelecionados";
-import { TotalAbatimentosSelecionadosPorNf } from "@/components/ui/totalAbatimentosSelecionadosPorNf";
-import { Titulo } from "@/components/ui/titulo";
+import { TotalAbatimentosSelecionados } from "../components/ui/totalAbatimentosSelecionados";
+import { TotalAbatimentosSelecionadosPorNf } from "../components/ui/totalAbatimentosSelecionadosPorNf";
+import { Titulo } from "../components/ui/titulo";
 
 type NfType = {
   numero: string;

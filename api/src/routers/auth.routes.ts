@@ -8,6 +8,7 @@ import { SignInController, type SignInRequest } from "../controllers/auth/Sign-i
 import { SignOutController } from "../controllers/auth/Sign-out-controller.js";
 import { SelectCNPJController, type SelectCNPJRequest } from "../controllers/account/SelectCNPJ-controller.js";
 import { checkAuth } from "../middleware/jwt.js";
+import { MeController } from "../controllers/auth/Me-controller.js";
 
 export async function AuthRoutes(
   fastify: FastifyInstance
@@ -15,6 +16,7 @@ export async function AuthRoutes(
   const signInController = new SignInController();
   const signOutController = new SignOutController();
   const selectCNPJController = new SelectCNPJController();
+  const meController = new MeController();
 
   const ErrorResponseSchema = z.object({
     status: z.literal("ERROR"),
@@ -34,9 +36,10 @@ export async function AuthRoutes(
         response: {
           200: z.object({
             account: z.object({
+              id: z.number(),
               name: z.string(),
               email: z.string(),
-              id: z.number(),
+              role: z.string(),
               created_at: z.date(),
               updated_at: z.date(),
             })
@@ -53,15 +56,27 @@ export async function AuthRoutes(
     }
   );
 
-  fastify.post(
+  fastify.get(
     "/auth/me",
     {
       schema: {
         tags: ["Autenticação"],
         description: "Endpoint responsável por trazer os detalhes do usuário",
+        security: [
+          {
+            bearerAuth: []
+          }
+        ],
         response: {
           200: z.object({
-            message: z.string()
+            account: z.object({
+              id: z.number(),
+              name: z.string(),
+              email: z.string(),
+              role: z.string(),
+              created_at: z.date(),
+              updated_at: z.date(),
+            })
           }),
 
           400: ErrorResponseSchema,
@@ -69,9 +84,10 @@ export async function AuthRoutes(
           500: ErrorResponseSchema
         }
       },
+      preHandler: [ checkAuth ],
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      return reply.send({ message: "Rodando "});
+      return meController.handle(request, reply);
     }
   );
 

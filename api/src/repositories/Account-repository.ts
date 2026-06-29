@@ -66,6 +66,17 @@ export class AccountRepository {
   }
 
   public async list() {
+    const accounts = await this.prismaClient.accountRoles.findMany({
+      include: {
+        account: {
+          include: {
+            accountInfo: true
+          }
+        },
+        role: true,
+      }
+    });
 
+    return accounts;
   }
 }

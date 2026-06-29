@@ -7,7 +7,7 @@ import {
 import { Field } from "./field";
 import { Checkbox } from "./checkbox";
 import { Label } from "./label";
-import { ParcelaType, TitulosType } from "@/app/page";
+import { ParcelaType, TitulosType } from "../../app/page";
 
 export const Titulo = ({
   titulo,
