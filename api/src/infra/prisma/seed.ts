@@ -44,15 +44,29 @@ async function main() {
     },
   });
 
-  await prisma.accountRoles.create({
-    data: {
+  await prisma.accountRoles.upsert({
+    where: {
+      account_id_role_id: {
+        account_id: admin_account.id,
+        role_id: admin_role.id,
+      }
+    },
+    update: {},
+    create: {
       account_id: admin_account.id,
       role_id: admin_role.id
     }
   });
   
-  await prisma.accountRoles.create({
-    data: {
+  await prisma.accountRoles.upsert({
+    where: {
+      account_id_role_id: {
+        account_id: operator_account.id,
+        role_id: operator_role.id,
+      }
+    },
+    update: {},
+    create: {
       account_id: operator_account.id,
       role_id: operator_role.id
     }

@@ -65,6 +65,28 @@ export class AccountRepository {
 
   }
 
+  public async changePassword() {
+    let hashed_password = await hash(this.password, 12);
+
+    const account = await this.prismaClient.account.update({
+      where: { id: this.account_id },
+      data: {
+        password: hashed_password
+      }
+    });
+
+    return account;
+  }
+
+  public async changeFirstLogin() {
+    await this.prismaClient.account.update({
+      where: { id: this.account_id },
+      data: {
+        first_login: false,
+      }
+    });
+  }
+
   public async list() {
     const accounts = await this.prismaClient.accountRoles.findMany({
       include: {

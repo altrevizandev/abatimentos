@@ -22,7 +22,7 @@ export class RoleRepository {
     });
   }
 
-  public list() {
-
+  public async list() {
+    return await this.prismaClient.role.findMany();
   }
 }

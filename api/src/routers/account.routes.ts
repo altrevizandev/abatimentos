@@ -33,8 +33,7 @@ export async function AccountRoutes(
         body: z.object({
           name: z.string(),
           email: z.string(),
-          password: z.string(),
-          role: z.enum(["viewer", "operator", "admin"])
+          role: z.enum(["operator", "admin"])
         }),
         response: {
           201: z.object({

@@ -4,7 +4,6 @@ import { CreateAccountService } from "../../services/account/Create-service.js";
 type CreateAccountData = {
   name: string;
   email: string;
-  password: string;
   role: string;
 }
 
@@ -23,13 +22,11 @@ export class CreateAccountController {
     const {
       name,
       email,
-      password,
       role
     } = request.body;
 
     this.createAccountService.name = name;
     this.createAccountService.email = email;
-    this.createAccountService.password = password;
     this.createAccountService.role = role;
 
     const account = await this.createAccountService.execute();

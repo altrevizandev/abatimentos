@@ -240,6 +240,7 @@ export type AccountRolesOrderByWithRelationInput = {
 
 export type AccountRolesWhereUniqueInput = Prisma.AtLeast<{
   id?: number
+  account_id_role_id?: Prisma.AccountRolesAccount_idRole_idCompoundUniqueInput
   AND?: Prisma.AccountRolesWhereInput | Prisma.AccountRolesWhereInput[]
   OR?: Prisma.AccountRolesWhereInput[]
   NOT?: Prisma.AccountRolesWhereInput | Prisma.AccountRolesWhereInput[]
@@ -249,7 +250,7 @@ export type AccountRolesWhereUniqueInput = Prisma.AtLeast<{
   updated_at?: Prisma.DateTimeFilter<"AccountRoles"> | Date | string
   account?: Prisma.XOR<Prisma.AccountScalarRelationFilter, Prisma.AccountWhereInput>
   role?: Prisma.XOR<Prisma.RoleScalarRelationFilter, Prisma.RoleWhereInput>
-}, "id">
+}, "id" | "account_id_role_id">
 
 export type AccountRolesOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -334,6 +335,11 @@ export type AccountRolesListRelationFilter = {
 
 export type AccountRolesOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type AccountRolesAccount_idRole_idCompoundUniqueInput = {
+  account_id: number
+  role_id: number
 }
 
 export type AccountRolesCountOrderByAggregateInput = {

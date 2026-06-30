@@ -35,8 +35,6 @@ export class SignInService {
 
     const accountRole = await this.accountRoleRepository.findByAccountId();
 
-    console.log(accountRole);
-
     if (!accountRole) {
       throw new ApiError("Nenhuma função foi encontrada para essa conta", 404);
     }
@@ -46,6 +44,7 @@ export class SignInService {
       name: account.name,
       email: account.email,
       role: accountRole.role.slug,
+      first_login: accountRole.account.first_login,
       created_at: account.created_at,
       updated_at: account.updated_at
     };

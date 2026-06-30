@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, Controller } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/card';
 import { Field, FieldError, FieldGroup, FieldLabel } from '../ui/field';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
@@ -19,14 +19,19 @@ import {
 import { SignedAccount, useSignedAccount } from '../../../store/signedAccount';
 import { Separator } from '../ui/separator';
 
-const signInSchema = z.object({
-  email: z.email("Insira um e-mail valido"),
-  password: z.string().min(15, "A senha precisa ter pelo menos 15 caracteres"),
-});
+const changePasswordSchema = z
+  .object({
+    password: z.string().min(8, "A senha precisa de pelo menos 8 caracteres"),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "As senhas não são iguais",
+    path: ["confirmPassword"],
+  });
 
-type SignInFormData = z.infer<typeof signInSchema>;
+type ChangePasswordFormData = z.infer<typeof changePasswordSchema>;
 
-type SignInAPIResponse = {
+type ChangePasswordAPIResponse = {
   account: SignedAccount
 }
 
@@ -35,33 +40,33 @@ export type ApiErrorData = {
   message: string
 }
 
-export const SignInForm = () => {
+export const ChangePasswordForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [apiError, setApiError] = useState<ApiErrorData>({
     message: "",
     status: ""
   });
 
-  const router = useRouter();
-
   const {
-    setSignedAccount
+    account
   } = useSignedAccount();
 
-  const form = useForm<SignInFormData>({
-    resolver: zodResolver(signInSchema),
+  const router = useRouter();
+
+  const form = useForm<ChangePasswordFormData>({
+    resolver: zodResolver(changePasswordSchema),
     defaultValues: {
-      email: '',
-      password: ''
+      password: '',
+      confirmPassword: ''
     }
   });
 
-  const onSubmit = async (data: SignInFormData) => {
+  const onSubmit = async (data: ChangePasswordFormData) => {
     setIsSubmitting(true);
     try {
       const request = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/sign-in`, {
-        method: "POST",
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/change-password`, {
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json"
         },
@@ -75,17 +80,7 @@ export const SignInForm = () => {
         setApiError(data);
       }
 
-      const {
-        account
-      } = await request.json() as SignInAPIResponse;
-
-      setSignedAccount(account);
-
-      if (account.first_login) {
-        return router.replace("/auth/change-password");
-      }
-
-      if (account.role == "admin") {
+      if (account?.role == "admin") {
         return router.replace("/dashboard");
       } else {
         return router.replace("/select-cnpj");
@@ -99,6 +94,10 @@ export const SignInForm = () => {
     <Card className="flex-1 max-w-112.5 md:m-auto">
       <CardHeader>
         <CardTitle className='text-center'>Tirol Abatimentos</CardTitle>
+        <CardDescription>
+          Primeiro Login<br/>
+          Altere sua senha para continuar
+        </CardDescription>
       </CardHeader>
       <Separator />
       <CardContent>

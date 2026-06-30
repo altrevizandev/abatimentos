@@ -9,6 +9,7 @@ import { SignOutController } from "../controllers/auth/Sign-out-controller.js";
 import { SelectCNPJController, type SelectCNPJRequest } from "../controllers/account/SelectCNPJ-controller.js";
 import { checkAuth } from "../middleware/jwt.js";
 import { MeController } from "../controllers/auth/Me-controller.js";
+import { ChangePasswordController, type ChangePasswordRequest } from "../controllers/auth/Change-password-controller.js";
 
 export async function AuthRoutes(
   fastify: FastifyInstance
@@ -17,6 +18,7 @@ export async function AuthRoutes(
   const signOutController = new SignOutController();
   const selectCNPJController = new SelectCNPJController();
   const meController = new MeController();
+  const changePasswordController = new ChangePasswordController();
 
   const ErrorResponseSchema = z.object({
     status: z.literal("ERROR"),
@@ -40,6 +42,7 @@ export async function AuthRoutes(
               name: z.string(),
               email: z.string(),
               role: z.string(),
+              first_login: z.boolean(),
               created_at: z.date(),
               updated_at: z.date(),
             })
@@ -74,6 +77,7 @@ export async function AuthRoutes(
               name: z.string(),
               email: z.string(),
               role: z.string(),
+              first_login: z.boolean(),
               created_at: z.date(),
               updated_at: z.date(),
             })
@@ -141,6 +145,38 @@ export async function AuthRoutes(
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       return selectCNPJController.handle(request as FastifyRequest<SelectCNPJRequest>, reply);
+    }
+  );
+  
+  fastify.patch(
+    "/auth/change-password",
+    {
+      schema: {
+        tags: ["Autenticação"],
+        description: "Endpoint responsável por alterar a senha da conta",
+        security: [
+          {
+            bearerAuth: []
+          }
+        ],
+        body: z.object({
+          password: z.string().min(8, "A senha precisa de pelo menos 8 caracteres"),
+          confirmPassword: z.string(),
+        }),
+        response: {
+          200: z.object({
+            message: z.string(),
+          }),
+
+          400: ErrorResponseSchema,
+
+          500: ErrorResponseSchema
+        }
+      },
+      preHandler: [ checkAuth ],
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      return changePasswordController.handle(request as FastifyRequest<ChangePasswordRequest>, reply);
     }
   );
 }

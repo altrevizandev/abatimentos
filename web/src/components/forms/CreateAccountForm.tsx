@@ -13,7 +13,7 @@ import {
   AlertTitle,
 } from "../ui/alert";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ApiErrorData } from "./SignIn";
 import { useRouter } from "next/navigation";
 import { useSignedAccount } from "../../../store/signedAccount";
@@ -38,8 +38,21 @@ type CreateAccountAPIResponse = {
   }
 }
 
+type AccountRoleType = {
+  id: number
+  name: string
+  slug: string
+  created_at: Date
+  updated_at: Date
+}
+
 export const CreateAccountForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [roles, setRoles] = useState<AccountRoleType[]>([]);
+  const [apiErrorFetchRoles, setApiErrorFetchRoles] = useState<ApiErrorData>({
+    message: "",
+    status: ""
+  });
   const [apiError, setApiError] = useState<ApiErrorData>({
     message: "",
     status: ""
@@ -60,6 +73,33 @@ export const CreateAccountForm = () => {
       role: 'operator'
     }
   });
+
+  useEffect(() => {
+    async function loadRoles() {
+      const request = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/roles`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include',
+        }
+      );
+
+      if (!request.ok) {
+        const data = await request.json() as ApiErrorData;
+
+        setApiErrorFetchRoles(data);
+      }
+
+      const roles = await request.json() as AccountRoleType[];
+
+      setRoles(roles);
+    }
+
+    loadRoles();
+  }, []);
 
   const onSubmit = async (data: CreateAccountFormData) => {
     setIsSubmitting(true);
@@ -158,22 +198,12 @@ export const CreateAccountForm = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
-                      <SelectItem value="admin">Administrador</SelectItem>
-                      <SelectItem value="operator">Cliente</SelectItem>
+                      {roles.map((role) => (
+                        <SelectItem key={role.id} value={role.slug}>{role.name}</SelectItem>
+                      ))}
                     </SelectGroup>
                   </SelectContent>
                 </Select>
-                {/* <FieldLabel htmlFor="form-role">
-                  Senha
-                </FieldLabel>
-                <Input
-                  {...field}
-                  id="form-role"
-                  type="text"
-                  aria-invalid={fieldState.invalid}
-                  placeholder="E-mail do cliente"
-                  autoComplete="off"
-                /> */}
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}

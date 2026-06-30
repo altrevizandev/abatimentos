@@ -18,6 +18,7 @@ model Account {
   name String
   email String @unique
   password String
+  first_login Boolean @default(true)
 
   accountInfo AccountInfo[]
   account_roles AccountRoles[]
@@ -67,7 +68,7 @@ model AccountRoles {
   created_at DateTime @default(now())
   updated_at DateTime @default(now())
 
-  @@index([account_id, role_id])
+  @@unique([account_id, role_id])
 
   @@map("account_roles")
 }

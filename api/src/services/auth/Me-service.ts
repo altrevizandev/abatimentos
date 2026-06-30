@@ -23,6 +23,7 @@ export class MeService {
       name: accountRole.account.name,
       email: accountRole.account.email,
       role: accountRole.role.slug,
+      first_login: accountRole.account.first_login,
       created_at: accountRole.account.created_at,
       updated_at: accountRole.account.updated_at
     };

@@ -49,6 +49,9 @@ CREATE UNIQUE INDEX "account_email_key" ON "account"("email");
 -- CreateIndex
 CREATE UNIQUE INDEX "roles_slug_key" ON "roles"("slug");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "account_roles_account_id_role_id_key" ON "account_roles"("account_id", "role_id");
+
 -- AddForeignKey
 ALTER TABLE "account_info" ADD CONSTRAINT "account_info_account_id_fkey" FOREIGN KEY ("account_id") REFERENCES "account"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
