@@ -1,7 +1,8 @@
 'use client';
 
 import {
-  MenuIcon
+  MenuIcon,
+  Users
 } from 'lucide-react';
 import {
   Drawer,
@@ -14,6 +15,7 @@ import { useState } from 'react';
 import { ApiErrorData } from '../forms/SignIn';
 import { useRouter } from 'next/navigation';
 import { Separator } from './separator';
+import Link from 'next/link';
 
 export const Navbar = () => {
   const [apiError, setApiError] = useState<ApiErrorData>({
@@ -55,10 +57,18 @@ export const Navbar = () => {
     }
   
   return (
-    <header className="flex items-center justify-center mb-10">
+    <header className="flex items-center justify-center mb-10 border border-l-0 border-r-0 border-t-0">
       <div className="container p-3 flex justify-between items-center">
         <div>
-          <span className="text-3xl font-medium">Abatimentos</span>
+          <Link href="/dashboard">
+            <span className="text-3xl font-medium">Abatimentos</span>
+          </Link>
+        </div>
+        <div className='hidden md:flex md:gap-2'>
+          <Link href="/accounts" className='flex items-center gap-2'>
+            <Users />
+            Contas
+          </Link>
         </div>
         <div className='block md:hidden'>
           <Drawer direction='right'>
@@ -72,22 +82,21 @@ export const Navbar = () => {
                   flex-col
                   flex-1
                   items-center
-                  text-2xl
                   gap-5
                 "
               >
-                <small>Logado como</small>
-                <span className='font-md'>{account?.name}</span>
-                <Separator />
-                <small>Navegação</small>
-                <a href="/accounts" className="hover:cursor-pointer border rounded px-2">Contas</a>
-                <Separator />
+                <span className='font-md text-lg'>{account?.name}</span>
                 <Button
                   size='sm'
                   variant='destructive'
                   className="hover:cursor-pointer"
                   onClick={() => onLogout()}
                 >Sair</Button>
+                <Separator />
+                <Link href="/accounts" className="flex gap-2 items-center">
+                  <Users />
+                  Contas
+                </Link>
               </div>
             </DrawerContent>
           </Drawer>
