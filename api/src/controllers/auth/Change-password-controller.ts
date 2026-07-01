@@ -36,7 +36,7 @@ export class ChangePasswordController {
     }
 
     return reply.code(200).send({
-      account
+      message: "Senha alterada com sucesso"
     });
   }
 }

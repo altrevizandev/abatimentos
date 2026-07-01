@@ -92,10 +92,9 @@ export const ChangePasswordForm = () => {
 
   return (
     <Card className="flex-1 max-w-112.5 md:m-auto">
-      <CardHeader>
-        <CardTitle className='text-center'>Tirol Abatimentos</CardTitle>
+      <CardHeader className='flex flex-col gap-2 items-center'>
+        <CardTitle className='text-2xl'>Tirol Abatimentos</CardTitle>
         <CardDescription>
-          Primeiro Login<br/>
           Altere sua senha para continuar
         </CardDescription>
       </CardHeader>
@@ -117,31 +116,7 @@ export const ChangePasswordForm = () => {
         >
           <FieldGroup>
             <Controller
-              name='email'
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-email">
-                    Email
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    id="form-email"
-                    type="email"
-                    aria-invalid={fieldState.invalid}
-                    placeholder="joe@example.com"
-                    autoComplete="off"
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-          </FieldGroup>
-          <FieldGroup className="grid gap-2">
-            <Controller
-              name="password"
+              name='password'
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
@@ -153,7 +128,31 @@ export const ChangePasswordForm = () => {
                     id="form-password"
                     type="password"
                     aria-invalid={fieldState.invalid}
-                    placeholder="**************"
+                    placeholder="*********************"
+                    autoComplete="off"
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+          </FieldGroup>
+          <FieldGroup className="grid gap-2">
+            <Controller
+              name="confirmPassword"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-confirm-password">
+                    Confirme sua senha
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="form-confirm-password"
+                    type="password"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="*********************"
                     autoComplete="off"
                   />
                   {fieldState.invalid && (
@@ -176,7 +175,7 @@ export const ChangePasswordForm = () => {
           </Button>
         ) : (
           <Button type="submit" className="w-full" form="form-sign-in">
-            Entrar
+            Avançar
           </Button>
         )}
       </CardFooter>

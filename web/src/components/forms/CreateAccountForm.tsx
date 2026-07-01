@@ -3,7 +3,7 @@
 import * as z from 'zod';
 import { AlertCircleIcon } from 'lucide-react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, useFormContext } from 'react-hook-form';
 import { Field, FieldError, FieldGroup, FieldLabel } from '../ui/field';
 import { Input } from '../ui/input';
 import { Spinner } from '../ui/spinner';
@@ -22,7 +22,6 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 const createAccountSchema = z.object({
   name: z.string(),
   email: z.email("Insira um e-mail valido"),
-  password: z.string().min(15, "A senha precisa ter pelo menos 15 caracteres"),
   role: z.enum(["admin", "operator"], "Insira uma função valida")
 });
 
@@ -61,18 +60,11 @@ export const CreateAccountForm = () => {
   const router = useRouter();
 
   const {
-    setSignedAccount
+    setUpdateAccountsList,
+    updateAccountsList
   } = useSignedAccount();
 
-  const form = useForm<CreateAccountFormData>({
-    resolver: zodResolver(createAccountSchema),
-    defaultValues: {
-      name: '',
-      email: '',
-      password: '',
-      role: 'operator'
-    }
-  });
+  const form = useFormContext<CreateAccountFormData>();
 
   useEffect(() => {
     async function loadRoles() {
@@ -120,9 +112,7 @@ export const CreateAccountForm = () => {
         setApiError(data);
       }
 
-      const {
-        account
-      } = await request.json() as CreateAccountAPIResponse;
+      setUpdateAccountsList(updateAccountsList!);
     } catch (error) {
       console.log(error);
     }
@@ -132,7 +122,7 @@ export const CreateAccountForm = () => {
     <div>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        id='form-sign-in'
+        id='form-create-account'
         className="flex flex-col gap-3"
       >
         <FieldGroup>

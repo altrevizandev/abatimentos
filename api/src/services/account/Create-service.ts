@@ -1,3 +1,4 @@
+import { randomInt } from "node:crypto";
 import { AccountRepository } from "../../repositories/Account-repository.js";
 import { AccountRoleRepository } from "../../repositories/AccountRoles-repository.js";
 import { RoleRepository } from "../../repositories/Role-repository.js";
@@ -7,13 +8,13 @@ import { SendEmailService } from "../email/send-email-service.js";
 export class CreateAccountService {
   public name: string = "";
   public email: string = "";
-  public password: string = "";
   public role: string = "";
+  private password: string = "";
 
   private readonly accountRepository: AccountRepository;
   private readonly accountRoleRepository: AccountRoleRepository;
   private readonly roleRepository: RoleRepository;
-  
+
   constructor() {
     this.accountRepository = new AccountRepository();
     this.accountRoleRepository = new AccountRoleRepository();
@@ -30,7 +31,10 @@ export class CreateAccountService {
       throw new ApiError("Já existe uma conta com esse e-mail cadastrado", 400);
     }
 
-    this.accountRepository.password = await this.generatePassword();
+    this.password = await this.generatePassword();
+
+    this.accountRepository.password = this.password;
+
 
     const account = await this.accountRepository.create();
 
@@ -52,7 +56,7 @@ export class CreateAccountService {
     sendEmailService.from = process.env.MAIL_FROM!;
     sendEmailService.subject = "Abatimentos Tirol - Criação de Conta";
     sendEmailService.to = this.email;
-    sendEmailService.html = `<p>A sua senha inicial para acessar sua conta no portal de abatimentos Tirol é <strong>Guatemala15</strong></p>`;
+    sendEmailService.html = `<p>A sua senha inicial para acessar sua conta no portal de abatimentos Tirol é <strong>${this.password}</strong></p>`;
 
     await sendEmailService.execute();
 
@@ -60,42 +64,28 @@ export class CreateAccountService {
   }
 
   public async generatePassword() {
-    let pass_chars = process.env.PASS_CHARS!;
-    let pass_numbers = process.env.PASS_NUMBERS!;
-    let pass_special_chars = process.env.PASS_SPECIAL_CHARS!;
+    const letters = process.env.PASS_CHARS!;
+    const numbers = process.env.PASS_NUMBERS!;
+    const specials = process.env.PASS_SPECIAL_CHARS!;
 
-    let new_password = "";
+    const password: string[] = [];
 
-    while(new_password.length < 6) {
-      let char_index = Math.floor(Math.random() * pass_chars.length);
+    password.push(letters[randomInt(letters.length)]!);
+    password.push(numbers[randomInt(numbers.length)]!);
+    password.push(specials[randomInt(specials.length)]!);
 
-      if (new_password.includes(pass_chars[char_index]!)) {
-        continue;
-      }
+    const all = letters + numbers + specials;
 
-      new_password += pass_chars[char_index];
+    while (password.length < 8) {
+      password.push(all[randomInt(all.length)]!);
     }
 
-    while(new_password.length < 7) {      
-      let number_index = Math.floor(Math.random() * pass_numbers.length);
-
-      if (new_password.includes(pass_numbers[number_index]!)) {
-        continue;
-      }
-
-      new_password += pass_numbers[number_index];
+    // embaralha (Fisher-Yates)
+    for (let i = password.length - 1; i > 0; i--) {
+      const j = randomInt(i + 1);
+      [password[i], password[j]] = [password[j]!, password[i]!];
     }
 
-    while (new_password.length < 8) {
-      let special_index = Math.floor(Math.random() * pass_special_chars.length);
-
-      if (new_password.includes(pass_special_chars[special_index]!)) {
-        continue;
-      }
-      
-      new_password += pass_special_chars[special_index];
-    }
-
-    return new_password;
+    return password.join("");
   }
 }

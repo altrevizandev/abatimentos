@@ -14,6 +14,8 @@ type SignedAccountStore = {
   isSigned: boolean;
   setSignedAccount: (p_data: SignedAccount) => void;
   logout: () => void;
+  updateAccountsList: boolean;
+  setUpdateAccountsList: (data: boolean) => void;
 }
 
 export const useSignedAccount = create<SignedAccountStore>()(
@@ -32,7 +34,13 @@ export const useSignedAccount = create<SignedAccountStore>()(
           account: null,
           isSigned: false,
         });
-      }
+      },
+      updateAccountsList: false,
+      setUpdateAccountsList: (value: boolean) => {
+        set({
+          updateAccountsList: value,
+        })
+      },
     }),
     {
       name: 'signed-account',

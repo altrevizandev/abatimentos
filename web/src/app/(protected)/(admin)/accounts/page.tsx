@@ -8,14 +8,19 @@ import { Account, account_collumns } from "./columns";
 import { ApiErrorData } from "@/components/forms/SignIn";
 import { AccountsDataTable } from "./data-table";
 import { Spinner } from "@/components/ui/spinner";
+import { useSignedAccount } from "../../../../../store/signedAccount";
 
 export default function AccountsPage() {
   const [loading, setLoading] = useState(true);
   const [accounts, setAccounts] = useState<Account[]>([]);
-   const [apiError, setApiError] = useState<ApiErrorData>({
+  const [apiError, setApiError] = useState<ApiErrorData>({
     message: "",
     status: ""
   });
+
+  const {
+    updateAccountsList
+  } = useSignedAccount();
 
   useEffect(() => {
     async function getAccounts() {
@@ -48,7 +53,7 @@ export default function AccountsPage() {
     }
 
     getAccounts();
-  }, []);
+  }, [ updateAccountsList ]);
 
   if (loading) {
     return (

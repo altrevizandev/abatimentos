@@ -19,6 +19,8 @@ export class ChangePasswordService {
       throw new ApiError("Conta não encontrada", 500);
     }
 
+    this.accountRepository.password = this.password;
+
     await this.accountRepository.changePassword();
 
     return {

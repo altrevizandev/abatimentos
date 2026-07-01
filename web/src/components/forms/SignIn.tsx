@@ -21,7 +21,7 @@ import { Separator } from '../ui/separator';
 
 const signInSchema = z.object({
   email: z.email("Insira um e-mail valido"),
-  password: z.string().min(15, "A senha precisa ter pelo menos 15 caracteres"),
+  password: z.string().min(8, "A senha precisa ter pelo menos 8 caracteres"),
 });
 
 type SignInFormData = z.infer<typeof signInSchema>;
@@ -82,7 +82,7 @@ export const SignInForm = () => {
       setSignedAccount(account);
 
       if (account.first_login) {
-        return router.replace("/auth/change-password");
+        return router.replace("/change-password");
       }
 
       if (account.role == "admin") {
